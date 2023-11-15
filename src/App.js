@@ -3,18 +3,19 @@ import config from './config';
 
 import './App.css';
 import SearchIcon from './search.svg';
-import MovieCard from './MovieCard'
+import MovieCard from './MovieCard.jsx'
 
 const API_URL = 'https:omdbapi.com?apikey=' + config.API_KEY;
 
 const App = () => {
-    const [movies] = useState([])
+    const [movies, setMovies] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const searchMovies = async (title) => {
         const response = await fetch(`${API_URL}&s=${title}`)
         const data = await response.json()
 
-        console.log(data.Search)
+        setMovies(data.Search)
     }
 
     useEffect(() => {
@@ -28,13 +29,18 @@ const App = () => {
             {/* Search bar */}
             <div className='search'>
                 <input placeholder='Search for movie' 
-                value='Superman'
-                onChange={() => {}}
+                value={ searchTerm }
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        searchMovies(searchTerm)
+                    }
+                }}
                 />
                 <img 
                     src={SearchIcon}
                     alt='search'
-                    onClick={() => {}}
+                    onClick={() => searchMovies(searchTerm)}
                 />
             </div>
 
@@ -42,13 +48,14 @@ const App = () => {
             {movies?.length > 0 ? (
                 <div className='container'>
                     {movies.map((movie) => 
-                        <MovieCard
-                            key={movie.imdbID}  // Adding a unique key for each item in the array
-                            Year={movie.Year}
-                            Poster={movie.Poster}
-                            Type={movie.Type}
-                            Title={movie.Title}
-                        />
+                        <MovieCard movie={movie}/>
+                        // <MovieCard
+                        //     key={movie.imdbID}  // Adding a unique key for each item in the array
+                        //     Year={movie.Year}
+                        //     Poster={movie.Poster}
+                        //     Type={movie.Type}
+                        //     Title={movie.Title}
+                        // />
                     )} 
                 </div>
             ) : (
